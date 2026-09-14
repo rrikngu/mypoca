@@ -12,6 +12,7 @@ libraryDependencies ++= Seq(
 assembly / assemblyJarName := "activation-lab.jar"
 assembly / mainClass := Some("app.Main")
 assembly / assemblyMergeStrategy := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case _                             => MergeStrategy.first
+  case PathList("META-INF", "services", _ @ _*) => MergeStrategy.filterDistinctLines
+  case PathList("META-INF", _ @ _*)             => MergeStrategy.discard
+  case _                                        => MergeStrategy.first
 }

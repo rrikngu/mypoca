@@ -12,14 +12,37 @@ import upickle.default._
   */
 object Db {
 
-  // Vercel / most Postgres hosts give you a single connection string.
-  // Set POSTGRES_URL in your environment before running.
+  // Explicitly register the driver. The JAR normally does this itself via
+  // META-INF/services when it's on a plain classpath, but that mechanism is
+  // easy to accidentally strip when building a merged "fat" jar - calling
+  // this directly makes sure it works either way.
+  Class.forName("org.postgresql.Driver")
+
+  // Most hosts (Render, Heroku, Neon, Supabase) give you a connection string
+  // shaped like postgresql://user:pass@host:port/dbname - that's a normal
+  // Postgres URI, but JDBC needs jdbc:postgresql://host:port/dbname plus the
+  // user/password as query params instead of in the URI's user-info. We
+  // detect and convert automatically, whether or not a jdbc: prefix is
+  // already there, so you can paste any style of connection string in.
+  private def toJdbcUrl(raw: String): String = {
+    val withoutPrefix = raw.stripPrefix("jdbc:")
+    val uri = new java.net.URI(withoutPrefix)
+    if (uri.getUserInfo == null) {
+      if (raw.startsWith("jdbc:")) raw else s"jdbc:$raw"
+    } else {
+      val Array(user, password) = uri.getUserInfo.split(":", 2)
+      val port = if (uri.getPort > 0) uri.getPort else 5432
+      val dbName = uri.getPath.stripPrefix("/")
+      s"jdbc:postgresql://${uri.getHost}:$port/$dbName?user=$user&password=$password&sslmode=prefer"
+    }
+  }
+
   private def connect(): Connection = {
-    val url = sys.env.getOrElse(
+    val raw = sys.env.getOrElse(
       "POSTGRES_URL",
       throw new RuntimeException("POSTGRES_URL environment variable is not set")
     )
-    DriverManager.getConnection(url)
+    DriverManager.getConnection(toJdbcUrl(raw))
   }
 
   /** Create the events table if it doesn't already exist. Call this once on startup. */
