@@ -1,6 +1,20 @@
 # --- build stage ---
-FROM sbtscala/scala-sbt:eclipse-temurin-21.0.3_9_1.10.1_2.13.14 AS build
+FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates && rm -rf /var/lib/apt/lists/*
+
+ARG SBT_VERSION=1.10.1
+RUN curl -fsL "https://github.com/sbt/sbt/releases/download/v${SBT_VERSION}/sbt-${SBT_VERSION}.tgz" -o /tmp/sbt.tgz && \
+    tar -xzf /tmp/sbt.tgz -C /usr/local && \
+    ln -s /usr/local/sbt/bin/sbt /usr/local/bin/sbt && \
+    rm /tmp/sbt.tgz
+
+# Cache dependency resolution separately from source changes
+COPY project project
+COPY build.sbt .
+RUN sbt update
+
 COPY . .
 RUN sbt assembly
 
