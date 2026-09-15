@@ -5,7 +5,7 @@ import upickle.default._
 
 /** All database access lives here.
   *
-  * We use plain JDBC (no fancy library) so it's easy to see exactly what's
+  * plain JDBC so it's easy to see exactly what's
   * happening: open a connection, run a query, read the results, close the
   * connection. This mirrors what `lib/db.ts` + the `postgres` package did
   * in the original Next.js app, just written out by hand.
