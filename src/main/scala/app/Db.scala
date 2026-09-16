@@ -4,7 +4,7 @@ import java.sql.{Connection, DriverManager}
 import upickle.default._
 
 /** All database access lives here.
-  *
+  * EXTRA NOTE: NEED TO MODIFY FOR DIY
   * plain JDBC so it's easy to see exactly what's
   * happening: open a connection, run a query, read the results, close the
   * connection. This mirrors what `lib/db.ts` + the `postgres` package did
@@ -14,7 +14,7 @@ object Db {
 
   // Explicitly register the driver. The JAR normally does this itself via
   // META-INF/services when it's on a plain classpath, but that mechanism is
-  // easy to accidentally strip when building a merged "fat" jar - calling
+  // easy to accidentally strip when building a merged "fawwwt" jar - calling
   // this directly makes sure it works either way.
   Class.forName("org.postgresql.Driver")
 
