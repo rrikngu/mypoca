@@ -13,7 +13,7 @@ import upickle.default._
 object Db {
 
   // modify db with data for user tracking
-  Explicitly register the driver. The JAR normally does this itself via
+  // Explicitly register the driver. The JAR normally does this itself via
   // META-INF/services when it's on a plain classpath, but that mechanism is
   // easy to accidentally strip when building a merged "fawwwt" jar - calling
   // this directly makes sure it works either way.
